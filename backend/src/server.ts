@@ -4,12 +4,18 @@ import Router from 'express'
 import routes from './routes'
 import dotenv from 'dotenv'
 import { Server } from 'socket.io'
+import cors from 'cors'
 
 const app = express()
 const router = Router()
 const server = http.createServer(app)
 const io = new Server(server, { cors: { origin: "http://localhost:3000" } })
 
+const corsOptions = {
+  origin: '*'
+}
+
+app.use(cors(corsOptions))
 app.use(express.json())
 
 router.use('/api', routes)
