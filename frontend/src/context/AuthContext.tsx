@@ -21,23 +21,25 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
 
 
     const login = async (username: string, password: string) => {
-        // const headers = new Headers()
-        // headers.append('Accept', 'application/json')
-        // const data = await fetch('http://localhost:8888/api/auth/login', {
-        //     method: 'POST',
-        //     headers: headers,
-        //     body: JSON.stringify({email: username, password: password})
-        // })
-        // .then((res) => res.json())    
-        //.catch((e: Error) => setError(e))
-        
-        // if(!data) {
-        //     return;
-        // }
-        
-        setUser('Diego Moura')
+        const headers = new Headers()
 
-        router.push('/chat/123')
+        headers.append('Accept', 'application/json')
+        headers.append('Content-Type', 'application/json')
+        const data = await fetch('http://localhost:8888/api/auth/login', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({email: username, password: password})
+        })
+        .then((res) => res.json())    
+        .catch((e: Error) => setError(e))
+        
+        if(!data) {
+            return;
+        }
+        
+        setUser(data)
+
+        router.push('/chat/general')
     }
 
     const logout = async () => {
