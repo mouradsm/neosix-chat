@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { ReactNode, createContext, useContext, useState } from "react"
-
+import { jwtDecode } from "jwt-decode"
 
 interface AuthContextType {
     user: string|null
@@ -36,8 +36,10 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
         if(!data) {
             return;
         }
+
+        let decodedToken = jwtDecode(data.token)
         
-        setUser(data)
+        setUser(decodedToken.name)
 
         router.push('/chat/general')
     }
