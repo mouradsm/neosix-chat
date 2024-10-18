@@ -26,6 +26,7 @@ const login = async (req: Request, res: Response) => {
   
   const userEmail = rows[0].email
   const userPassword = rows[0].password
+  const userName = rows[0].name
 
   const isPasswordValid = await bcrypt.compare(password, userPassword)
  
@@ -33,7 +34,7 @@ const login = async (req: Request, res: Response) => {
     return res.status(422).json({ error: "Email ou senha inválidos" })
   }
 
-  const token = jwt.sign({email: userEmail}, process.env.JWT_SECRET as string, {
+  const token = jwt.sign({email: userEmail, name: userName}, process.env.JWT_SECRET as string, {
     expiresIn: '1h'
   })
 
