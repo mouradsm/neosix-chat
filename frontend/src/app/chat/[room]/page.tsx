@@ -38,24 +38,17 @@ export default function Page() {
     socket.emit("message", { room, message: newMessage });
 
     setMessageContent("");
-  };  
+  };
 
   return (
     <main className="flex flex-col justify-between bg-[#0a0a0a] min-h-96">
       <div className="flex flex-col w-full p-1 text-black">
         {messages.map((message, index) => (
-          <div
-            key={index}
-            className={`flex flex-row w-full ${
-              message.sender === user ? "justify-end" : "justify-start"
-            }`}
-          >
-            <div
-              className={`mt-1 ${
-                message.sender === user ? "bg-[#008069]" : "bg-gray-600"
-              } rounded-lg w-fit`}
-            >
-              <span className="p-2 font-bold text-green-300">~ {message.sender}</span>
+          <div key={index} className={`flex flex-row w-full ${message.sender === user ? "justify-end" : "justify-start"}`}>
+            <div className={`mt-1 ${message.sender === user ? "bg-[#008069]" : "bg-gray-600"} rounded-lg w-fit`}>
+              <span className="p-2 font-bold text-green-300">
+                ~ {message.sender}
+              </span>
               <p className="px-2 mt-2 font-medium text-right text-white rounded-md w-fit">
                 {message.content}
               </p>
