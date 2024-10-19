@@ -40,6 +40,10 @@ export default function Page() {
     setMessageContent("");
   };
 
+  //TODO: Redirecionar para Login se não tiver logado
+  // Ajustar rolagem da tela de chat, atualmente a barra de enviar mensagem fica descendo
+  // colocar menu lateral para enviar mensagem privada
+
   return (
     <main className="flex flex-col justify-between bg-[#0a0a0a] min-h-96">
       <div className="flex flex-col w-full p-1 text-black">
