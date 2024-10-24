@@ -24,19 +24,38 @@ dotenv.config()
 
 app.use(router)
 
+const connectedUsers = new Map<string, string>()
+
 io.on('connection', (socket) => {
+  console.log('User connected:', socket.id );
+
+  connectedUsers.set(socket.id, `User-${socket.id}`)
+
   socket.on('join-room', (room: string) => {
     socket.join(room);
-    console.log(`User joined room: ${room}`);
+    
   });
 
   socket.on('message', (body) => {
     console.log(body)
     io.to(body.room).emit('message', body.message);
   });
+
+  socket.on('private-message', ({to, message}) => {
+    const from = connectedUsers.get(socket.id)
+    
+    if(!from || !connectedUsers.has(to)) {
+      return;
+    }
+
+    io.to(to).emit('private-message', {from, message})
+    console.log(`Mensagem privada envia de ${from} para ${to}`)
+
+  })
   
   socket.on('disconnect', () => {
-    console.log('user disconnected')
+    console.log('user disconnected:', socket.id)
+    connectedUsers.delete(socket.id)
   })
 })
 
