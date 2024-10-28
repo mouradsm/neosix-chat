@@ -1,11 +1,12 @@
 'use client'
 
 import { useRouter } from "next/navigation"
-import { ReactNode, createContext, useContext, useState } from "react"
+import { ReactNode, createContext, useContext, useState, useEffect } from "react"
 import { jwtDecode } from "jwt-decode"
+import { useCookies } from "react-cookie"
 
 interface AuthContextType {
-    user: string|null
+    user: User|null
     error: Error|null
     login: (username: string, password: string) => Promise<void>
     logout: () => void
@@ -14,11 +15,24 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider = ({ children }: {children: ReactNode}) => {
-    const [user, setUser] = useState<string | null>(null)
+    const [user, setUser] = useState<User | null>(null)
     const [error, setError] = useState<Error | null>(null)
+    const [cookie, setCookie, removeCookie] = useCookies(['token'])
+
     const router = useRouter()
 
+    useEffect(() => {
+        const token = cookie.token
 
+        if(!token) {
+            return
+        }
+
+        let decodedToken = jwtDecode(token)
+
+        setUser(decodedToken as User)
+        
+    }, [router])
 
     const login = async (username: string, password: string) => {
         const headers = new Headers()
@@ -37,15 +51,18 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
             return;
         }
 
-        let decodedToken = jwtDecode(data.token)
+        // let decodedToken = jwtDecode(data.token)
         
-        setUser(decodedToken.name)
+        // setUser(decodedToken.name)
 
-        router.push('/chat/general')
+        setCookie('token', data.token, {path: '/'})
+
+        router.push('/chat')
     }
 
     const logout = async () => {
         setUser(null)
+        removeCookie('token', {path: '/'})
         router.push('/login')
 
     }
