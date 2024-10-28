@@ -6,13 +6,11 @@ import socket from "@/lib/socket";
 import { useAuth } from "@/context/AuthContext";
 
 export default function Page() {
-  const  room  = 'general'
+  const { room } = useParams();
 
   const { user } = useAuth();
 
   const [messages, setMessages] = useState<Message[]>([]);
-  const [privateMessages, setPrivateMessages] = useState<Message[]>([]);
-  
   const [messageContent, setMessageContent] = useState("");
 
   useEffect(() => {
@@ -22,13 +20,8 @@ export default function Page() {
       setMessages((prev) => [...prev, msg]);
     });
 
-    socket.on('private-message', (msg) => {
-
-    })
-
     return () => {
       socket.off("message");
-      socket.off("private-message");
     };
   }, [room]);
 
