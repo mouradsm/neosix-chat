@@ -1,4 +1,5 @@
 interface Message {
-    sender: string    
+    to: User ,
+    sender: User    
     content: string
 }
