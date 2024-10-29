@@ -26,36 +26,45 @@ app.use(router)
 
 const connectedUsers = new Map<string, string>()
 
+io.use((socket, next) => {
+  const user = socket.handshake.auth.user
+  if(!user) {
+    return next(new Error('Usuário Inválido'))
+  }
+
+  socket.username = user.name
+  socket.userId = user.id  
+  next()
+})
+
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id );
 
-  connectedUsers.set(socket.id, `User-${socket.id}`)
+  connectedUsers.set(socket.userId, socket.username)
+
+  io.emit('users-online', Array.from(connectedUsers, ([id, name]) => ({id, name})))
 
   socket.on('join-room', (room: string) => {
-    socket.join(room);
-    
+    socket.join(room);    
   });
 
-  socket.on('message', (body) => {
-    console.log(body)
-    io.to(body.room).emit('message', body.message);
-  });
+  socket.on('message', ({to, message}) => {
 
-  socket.on('private-message', ({to, message}) => {
-    const from = connectedUsers.get(socket.id)
-    
-    if(!from || !connectedUsers.has(to)) {
+    const from = connectedUsers.get(socket.userId)
+
+    if(!from || !connectedUsers.get(to.id)) {
       return;
     }
 
-    io.to(to).emit('private-message', {from, message})
-    console.log(`Mensagem privada envia de ${from} para ${to}`)
-
-  })
+    console.log(message)
+    
+    io.to(to.id).emit('message', message);
+  });
   
   socket.on('disconnect', () => {
-    console.log('user disconnected:', socket.id)
-    connectedUsers.delete(socket.id)
+    console.log('user disconnected:', socket.id)    
+    connectedUsers.delete(socket.userId)
+    io.emit('users-online', Array.from(connectedUsers))
   })
 })
 

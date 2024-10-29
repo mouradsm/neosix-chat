@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import Nav from '../components/nav'
+import { UserProvider } from "@/context/UserContext";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -27,6 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <AuthProvider>
+      <UserProvider>
       <html lang="en">
         <body >         
             <div style={{display: 'grid', gridTemplateColumns: '1fr 3fr'}}>
@@ -37,6 +39,7 @@ export default function RootLayout({
             </div>
         </body>
       </html>
+      </UserProvider>
      </AuthProvider>
   );
 }

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 import { ReactNode, createContext, useContext, useState, useEffect } from "react"
 import { jwtDecode } from "jwt-decode"
 import { useCookies } from "react-cookie"
-
+import socket from '@/lib/socket'
 interface AuthContextType {
     user: User|null
     error: Error|null
@@ -31,6 +31,11 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
         let decodedToken = jwtDecode(token)
 
         setUser(decodedToken as User)
+
+        socket.auth = {user: decodedToken}
+        socket.connect()
+        
+            
         
     }, [router])
 

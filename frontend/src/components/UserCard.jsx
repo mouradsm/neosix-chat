@@ -1,16 +1,15 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
 
-const UserCard = ({ user }) => {
-  const router = useRouter();
 
+const UserCard = ({ user }) => {  
+  const {selectedUser} = useUser()
   return (
-    <div
-      onClick={() => router.push("/chat/" + user.id)}
-      className="flex flex-row justify-between w-full p-4 my-2 bg-white rounded-lg cursor-pointer"
+    <div      
+      className={`flex flex-row justify-between w-full p-4 my-2 ${selectedUser?.name == user?.name ? 'bg-slate-400' : 'bg-white'} rounded-lg cursor-pointer`}
     >
-      <p className="text-black">{user?.name}</p>
+      <p className="text-black">{user?.name} - {user.id}</p>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
