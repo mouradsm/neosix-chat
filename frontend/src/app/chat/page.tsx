@@ -41,26 +41,27 @@ export default function Page() {
       content: messageContent,
     };
 
-    socket.emit("message", { to: selectedUser, message: newMessage });
+    socket.emit("message" , { to: selectedUser, message: newMessage });
 
-    setMessageContent("");
+    setMessageContent(""); 
   };
 
   //TODO: Redirecionar para Login se não tiver logado
   // Ajustar rolagem da tela de chat, atualmente a barra de enviar mensagem fica descendo
   // colocar menu lateral para enviar mensagem privada
 
+  const filteredMessages = messages.filter((message) => (message.sender.id == user?.id && message.to.id == selectedUser?.id) 
+                    || (message.sender.id == selectedUser?.id && message.to.id == user?.id))
+
   return (
     selectedUser && (<main className="flex flex-col justify-between bg-[#0a0a0a] min-h-96">
       <div className="flex flex-col w-full p-1 text-black">
-        {messages       
-        .filter((message) => (message.sender.id == user?.id && message.to.id == selectedUser.id) 
-                          || (message.sender.id == selectedUser.id && message.to.id == user?.id))
-        .map((message, index) => (
+        {
+        filteredMessages.map((message, index) => (
           <div key={index} className={`flex flex-row w-full ${message?.sender?.name === user?.name ? "justify-end" : "justify-start"}`}>
             <div className={`mt-1 ${message?.sender?.name === user?.name ? "bg-[#008069]" : "bg-gray-600"} rounded-lg w-fit`}>
               <span className="p-2 font-bold text-green-300">
-                ~ {message.sender.id} to {message.to.id} 
+                ~ {message.sender.name}
               </span>
               <p className="px-2 mt-2 font-medium text-right text-white rounded-md w-fit">
                 {message.content}

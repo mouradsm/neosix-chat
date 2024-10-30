@@ -9,7 +9,7 @@ const UserCard = ({ user }) => {
     <div      
       className={`flex flex-row justify-between w-full p-4 my-2 ${selectedUser?.name == user?.name ? 'bg-slate-400' : 'bg-white'} rounded-lg cursor-pointer`}
     >
-      <p className="text-black">{user?.name} - {user.id}</p>
+      <p className="text-black">{user?.name}</p>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
