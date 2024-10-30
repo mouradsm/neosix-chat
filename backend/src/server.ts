@@ -64,7 +64,8 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log('user disconnected:', socket.id)    
     connectedUsers.delete(socket.userId)
-    io.emit('users-online', Array.from(connectedUsers))
+    io.emit('users-online', Array.from(connectedUsers, ([id, name]) => ({id, name})))
+
   })
 })
 
