@@ -8,7 +8,7 @@ import { useUser } from "@/context/UserContext";
 
 const Nav = () => {
   const [users, setUsers] = useState<User[]>([])
-   const {selectedUser, setSelectedUser} = useUser()
+   const {setSelectedUser} = useUser()
 
   useEffect(() => {
     socket.on('users-online', (onlineUsers: User[]) => {
