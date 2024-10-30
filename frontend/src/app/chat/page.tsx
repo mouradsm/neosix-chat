@@ -45,11 +45,7 @@ export default function Page() {
 
     setMessageContent(""); 
   };
-
-  //TODO: Redirecionar para Login se não tiver logado
-  // Ajustar rolagem da tela de chat, atualmente a barra de enviar mensagem fica descendo
-  // colocar menu lateral para enviar mensagem privada
-
+  
   const filteredMessages = messages.filter((message) => (message.sender.id == user?.id && message.to.id == selectedUser?.id) 
                     || (message.sender.id == selectedUser?.id && message.to.id == user?.id))
 
