@@ -14,9 +14,9 @@ const login = async (req: Request, res: Response) => {
   const result = await query(`SELECT * FROM users WHERE email = '${email}'`);  
 
   if(result.recordset.length === 0) {
-    return res.status(400).send({error: 'Usuário inexistente!'})
+    return res.status(400).send({error: 'Email ou senha inválidos'})
   }  
-  
+
   const user = result.recordset[0] as User
 
   const isPasswordValid = await bcrypt.compare(password, user.password)
@@ -52,7 +52,7 @@ const register = async (req: Request, res: Response) => {
 
   const hashedPassword = await bcrypt.hash(password, 10)
 
-  const response = await query(`INSERT INTO users (name, email, password) VALUES ('${name}','${email}', '${hashedPassword}')`)
+  await query(`INSERT INTO users (name, email, password) VALUES ('${name}','${email}', '${hashedPassword}')`)
     .catch((error) => {
         console.log(error)
         return res.status(500).json({error: error})
