@@ -5,6 +5,7 @@ GO
 CREATE TABLE [dbo].[users](
 	[id] [int] IDENTITY(1,1) NOT NULL,
 	[name] [varchar](max) NOT NULL,
+	[email] [varchar](max) NOT NULL,
 	[password] [varchar](max) NOT NULL
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
