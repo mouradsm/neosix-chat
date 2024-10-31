@@ -32,7 +32,9 @@ io.use((socket, next) => {
     return next(new Error('Usuário Inválido'))
   }
 
+  /* @ts-expect-error: */
   socket.username = user.name
+  /* @ts-expect-error: */
   socket.userId = user.id  
   next()
 })
@@ -40,6 +42,7 @@ io.use((socket, next) => {
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id );
 
+  /* @ts-expect-error: */
   connectedUsers.set(socket.userId, socket.username)
 
   io.emit('users-online', Array.from(connectedUsers, ([id, name]) => ({id, name})))
@@ -50,6 +53,7 @@ io.on('connection', (socket) => {
 
   socket.on('message', ({to, message}) => {
 
+    /* @ts-expect-error: */
     const from = connectedUsers.get(socket.userId)
 
     if(!from || !connectedUsers.get(to.id)) {
@@ -63,6 +67,7 @@ io.on('connection', (socket) => {
   
   socket.on('disconnect', () => {
     console.log('user disconnected:', socket.id)    
+    /* @ts-expect-error: */
     connectedUsers.delete(socket.userId)
     io.emit('users-online', Array.from(connectedUsers, ([id, name]) => ({id, name})))
 
