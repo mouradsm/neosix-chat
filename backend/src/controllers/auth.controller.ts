@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import pool from "../models/DB";
+import { query } from "../models/DB";
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
@@ -11,31 +11,21 @@ const login = async (req: Request, res: Response) => {
     return res.status(422).json({ error: "Email e senha são obrigatórios" });
   }
 
-  const connection = await pool.getConnection();
+  const result = await query(`SELECT * FROM users WHERE email = '${email}'`);  
 
-  const [rows] = await connection.execute(
-    "SELECT * FROM users WHERE email = ?",
-    [email]
-  );
-
-  if((rows as any[]).length == 0) {
+  if(result.recordset.length === 0) {
     return res.status(400).send({error: 'Usuário inexistente!'})
-  }
-
-  connection.release()
+  }  
   
-  const userId = rows[0].id
-  const userEmail = rows[0].email
-  const userPassword = rows[0].password
-  const userName = rows[0].name
+  const user = result.recordset[0] as User
 
-  const isPasswordValid = await bcrypt.compare(password, userPassword)
+  const isPasswordValid = await bcrypt.compare(password, user.password)
  
   if (!isPasswordValid) {
     return res.status(422).json({ error: "Email ou senha inválidos" })
   }
 
-  const token = jwt.sign({id: userId, email: userEmail, name: userName}, process.env.JWT_SECRET as string, {
+  const token = jwt.sign({id: user.id, email: user.email, name: user.name}, process.env.JWT_SECRET as string, {
     expiresIn: '1h'
   })
 
@@ -44,17 +34,15 @@ const login = async (req: Request, res: Response) => {
 
 const register = async (req: Request, res: Response) => {
 
-  const { email, password, password_confirmation } = req.body
+  const { name, email, password, password_confirmation } = req.body
   
   if(!email || !password || !password_confirmation) {
     return res.status(400).json({error: "Campos são obrigatórios"})
-  }
+  }  
 
-  const connection = await pool.getConnection()
-
-  const [existingUser] = await pool.query('SELECT * FROM users WHERE email = ?', email)
+  const result = await query(`SELECT * FROM users WHERE email = '${email}'`);  
     
-  if((existingUser as any[]).length > 0) {
+  if(result.recordset.length > 0) {
     return res.status(400).json({error: "O email informado já está sendo utilizado"})
   }
 
@@ -64,16 +52,11 @@ const register = async (req: Request, res: Response) => {
 
   const hashedPassword = await bcrypt.hash(password, 10)
 
-  const response = await connection
-    .execute("INSERT INTO users (email, password) VALUES (?,?)",
-        [email, hashedPassword ]
-    )
+  const response = await query(`INSERT INTO users (name, email, password) VALUES ('${name}','${email}', '${hashedPassword}')`)
     .catch((error) => {
         console.log(error)
-        return res.json(500).json({error: error})
-    })
-
-  connection.release()
+        return res.status(500).json({error: error})
+    })  
 
   return res.status(201).send({message: 'Usuário criado com sucesso'})
 };
