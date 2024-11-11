@@ -44,7 +44,7 @@ const addConnectedUser = (user: User) => {
 
 io.use((socket, next) => {
   const user = socket.handshake.auth.user
-  console.log(user)
+
   if(!user) {
     return next(new Error('Usuário Inválido'))
   }
@@ -58,8 +58,8 @@ io.use((socket, next) => {
 })
 
 io.on('connection', (socket) => {
+  
   /* @ts-expect-error: */
-
   console.log('User connected:', [ socket.userId, socket.username ]);
 
   addConnectedUser({id: socket.userId, name: socket.username, online: true} as User)  
@@ -73,7 +73,7 @@ io.on('connection', (socket) => {
   socket.on('message', ({to, message}) => {
 
     /* @ts-expect-error: */
-    const from = findUserById(userId)
+    const from = findUserById(socket.userId)
 
     if(!from || !findUserById(to.id)) {
       return;
