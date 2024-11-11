@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
         const token = cookie.token
 
         if(!token) {
-            return  ''
+            return 
         }
 
         let decodedToken = jwtDecode(token)
