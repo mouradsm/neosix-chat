@@ -1,6 +1,7 @@
-interface User {
+export default interface User {
     id: number;
     name: string;
     email: string;
     password: string;
+    online: boolean;
 }

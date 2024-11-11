@@ -5,6 +5,7 @@ import routes from './routes'
 import dotenv from 'dotenv'
 import { Server } from 'socket.io'
 import cors from 'cors'
+import User from './types/user.interface'
 
 const app = express()
 const router = Router()
@@ -24,10 +25,26 @@ dotenv.config()
 
 app.use(router)
 
-const connectedUsers = new Map<string, string>()
+const connectedUsers: User[] = [] 
+
+const findUserById = (id: number) => connectedUsers.find(user => user.id === id)
+
+const addConnectedUser = (user: User) => { 
+  if(!findUserById(user.id)) {
+    connectedUsers.push(user)
+    return
+  }
+
+  connectedUsers.map(connectedUser => {
+    if(connectedUser.id === user.id) {
+      connectedUser.online = true
+    }
+  })
+}
 
 io.use((socket, next) => {
   const user = socket.handshake.auth.user
+  console.log(user)
   if(!user) {
     return next(new Error('Usuário Inválido'))
   }
@@ -36,16 +53,18 @@ io.use((socket, next) => {
   socket.username = user.name
   /* @ts-expect-error: */
   socket.userId = user.id  
+  
   next()
 })
 
 io.on('connection', (socket) => {
-  console.log('User connected:', socket.id );
-
   /* @ts-expect-error: */
-  connectedUsers.set(socket.userId, socket.username)
 
-  io.emit('users-online', Array.from(connectedUsers, ([id, name]) => ({id, name})))
+  console.log('User connected:', [ socket.userId, socket.username ]);
+
+  addConnectedUser({id: socket.userId, name: socket.username, online: true} as User)  
+
+  io.emit('users-online', connectedUsers)
 
   socket.on('join-room', (room: string) => {
     socket.join(room);    
@@ -54,9 +73,9 @@ io.on('connection', (socket) => {
   socket.on('message', ({to, message}) => {
 
     /* @ts-expect-error: */
-    const from = connectedUsers.get(socket.userId)
+    const from = findUserById(userId)
 
-    if(!from || !connectedUsers.get(to.id)) {
+    if(!from || !findUserById(to.id)) {
       return;
     }
 
@@ -66,10 +85,16 @@ io.on('connection', (socket) => {
   });
   
   socket.on('disconnect', () => {
-    console.log('user disconnected:', socket.id)    
-    /* @ts-expect-error: */
-    connectedUsers.delete(socket.userId)
-    io.emit('users-online', Array.from(connectedUsers, ([id, name]) => ({id, name})))
+    console.log('user disconnected:', [ socket.userId, socket.username ]);    
+    
+    //update user status to offline
+    connectedUsers.map(user => {
+      if(user.id === socket.userId) {
+        user.online = false
+      }
+    })
+   
+    io.emit('users-online', connectedUsers)
 
   })
 })

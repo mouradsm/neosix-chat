@@ -25,14 +25,16 @@ export const AuthProvider = ({ children }: {children: ReactNode}) => {
         const token = cookie.token
 
         if(!token) {
-            return
+            return  ''
         }
 
         let decodedToken = jwtDecode(token)
 
         setUser(decodedToken as User)
 
-        socket.auth = {user: decodedToken}
+        const { name, id, email } = decodedToken as User
+
+        socket.auth = {user:  {name, id, email}}
         socket.connect()
         
             
